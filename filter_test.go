@@ -52,5 +52,4 @@ func TestFilterService_Get(t *testing.T) {
 		t.Errorf("Error given: %s", err)
 	}
 
-
 }

@@ -21,9 +21,9 @@ type Priority struct {
 // GetList gets all priorities from JIRA
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-priority-get
-func (s *PriorityService) GetList() ([]Priority, *Response, error) {
+func (s *PriorityService) GetList(opts ...RequestOption) ([]Priority, *Response, error) {
 	apiEndpoint := "rest/api/2/priority"
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

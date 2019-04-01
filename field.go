@@ -27,9 +27,9 @@ type FieldSchema struct {
 // GetList gets all fields from JIRA
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-field-get
-func (s *FieldService) GetList() ([]Field, *Response, error) {
+func (s *FieldService) GetList(opts ...RequestOption) ([]Field, *Response, error) {
 	apiEndpoint := "rest/api/2/field"
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -63,9 +63,9 @@ type GroupSearchOptions struct {
 // JIRA API docs: https://docs.atlassian.com/jira/REST/server/#api/2/group-getUsersFromGroup
 //
 // WARNING: This API only returns the first page of group members
-func (s *GroupService) Get(name string) ([]GroupMember, *Response, error) {
+func (s *GroupService) Get(name string, opts ...RequestOption) ([]GroupMember, *Response, error) {
 	apiEndpoint := fmt.Sprintf("/rest/api/2/group/member?groupname=%s", url.QueryEscape(name))
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -84,20 +84,20 @@ func (s *GroupService) Get(name string) ([]GroupMember, *Response, error) {
 // User of this resource is required to have sysadmin or admin permissions.
 //
 // JIRA API docs: https://docs.atlassian.com/jira/REST/server/#api/2/group-getUsersFromGroup
-func (s *GroupService) GetWithOptions(name string, options *GroupSearchOptions) ([]GroupMember, *Response, error) {
+func (s *GroupService) GetWithOptions(name string, searchOpts *GroupSearchOptions, opts ...RequestOption) ([]GroupMember, *Response, error) {
 	var apiEndpoint string
-	if options == nil {
+	if searchOpts == nil {
 		apiEndpoint = fmt.Sprintf("/rest/api/2/group/member?groupname=%s", url.QueryEscape(name))
 	} else {
 		apiEndpoint = fmt.Sprintf(
 			"/rest/api/2/group/member?groupname=%s&startAt=%d&maxResults=%d&includeInactiveUsers=%t",
 			url.QueryEscape(name),
-			options.StartAt,
-			options.MaxResults,
-			options.IncludeInactiveUsers,
+			searchOpts.StartAt,
+			searchOpts.MaxResults,
+			searchOpts.IncludeInactiveUsers,
 		)
 	}
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -113,13 +113,13 @@ func (s *GroupService) GetWithOptions(name string, options *GroupSearchOptions) 
 // Add adds user to group
 //
 // JIRA API docs: https://docs.atlassian.com/jira/REST/cloud/#api/2/group-addUserToGroup
-func (s *GroupService) Add(groupname string, username string) (*Group, *Response, error) {
+func (s *GroupService) Add(groupname string, username string, opts ...RequestOption) (*Group, *Response, error) {
 	apiEndpoint := fmt.Sprintf("/rest/api/2/group/user?groupname=%s", groupname)
 	var user struct {
 		Name string `json:"name"`
 	}
 	user.Name = username
-	req, err := s.client.NewRequest("POST", apiEndpoint, &user)
+	req, err := s.client.NewRequest("POST", apiEndpoint, &user, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -137,9 +137,9 @@ func (s *GroupService) Add(groupname string, username string) (*Group, *Response
 // Remove removes user from group
 //
 // JIRA API docs: https://docs.atlassian.com/jira/REST/cloud/#api/2/group-removeUserFromGroup
-func (s *GroupService) Remove(groupname string, username string) (*Response, error) {
+func (s *GroupService) Remove(groupname string, username string, opts ...RequestOption) (*Response, error) {
 	apiEndpoint := fmt.Sprintf("/rest/api/2/group/user?groupname=%s&username=%s", groupname, username)
-	req, err := s.client.NewRequest("DELETE", apiEndpoint, nil)
+	req, err := s.client.NewRequest("DELETE", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, err
 	}

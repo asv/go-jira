@@ -20,9 +20,9 @@ type CreateComponentOptions struct {
 }
 
 // Create creates a new JIRA component based on the given options.
-func (s *ComponentService) Create(options *CreateComponentOptions) (*ProjectComponent, *Response, error) {
+func (s *ComponentService) Create(compOpts *CreateComponentOptions, opts ...RequestOption) (*ProjectComponent, *Response, error) {
 	apiEndpoint := "rest/api/2/component"
-	req, err := s.client.NewRequest("POST", apiEndpoint, options)
+	req, err := s.client.NewRequest("POST", apiEndpoint, compOpts, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -33,11 +33,10 @@ type Filter struct {
 }
 
 // GetList retrieves all filters from Jira
-func (fs *FilterService) GetList() ([]*Filter, *Response, error) {
-
+func (fs *FilterService) GetList(opts ...RequestOption) ([]*Filter, *Response, error) {
 	options := &GetQueryOptions{}
 	apiEndpoint := "rest/api/2/filter"
-	req, err := fs.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := fs.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,9 +59,9 @@ func (fs *FilterService) GetList() ([]*Filter, *Response, error) {
 }
 
 // Get retrieves a single Filter from Jira
-func (fs *FilterService) Get(filterID int) (*Filter, *Response, error) {
+func (fs *FilterService) Get(filterID int, opts ...RequestOption) (*Filter, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/2/filter/%d", filterID)
-	req, err := fs.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := fs.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

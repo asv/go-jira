@@ -30,9 +30,9 @@ type Version struct {
 // Get gets version info from JIRA
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-version-id-get
-func (s *VersionService) Get(versionID int) (*Version, *Response, error) {
+func (s *VersionService) Get(versionID int, opts ...RequestOption) (*Version, *Response, error) {
 	apiEndpoint := fmt.Sprintf("/rest/api/2/version/%v", versionID)
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,9 +48,9 @@ func (s *VersionService) Get(versionID int) (*Version, *Response, error) {
 // Create creates a version in JIRA.
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-version-post
-func (s *VersionService) Create(version *Version) (*Version, *Response, error) {
+func (s *VersionService) Create(version *Version, opts ...RequestOption) (*Version, *Response, error) {
 	apiEndpoint := "/rest/api/2/version"
-	req, err := s.client.NewRequest("POST", apiEndpoint, version)
+	req, err := s.client.NewRequest("POST", apiEndpoint, version, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -78,9 +78,9 @@ func (s *VersionService) Create(version *Version) (*Version, *Response, error) {
 // Update updates a version from a JSON representation.
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-version-id-put
-func (s *VersionService) Update(version *Version) (*Version, *Response, error) {
+func (s *VersionService) Update(version *Version, opts ...RequestOption) (*Version, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/2/version/%v", version.ID)
-	req, err := s.client.NewRequest("PUT", apiEndpoint, version)
+	req, err := s.client.NewRequest("PUT", apiEndpoint, version, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -2,6 +2,7 @@ package jira
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,6 +15,15 @@ import (
 	"github.com/google/go-querystring/query"
 	"github.com/pkg/errors"
 )
+
+type RequestOption func(*http.Request) error
+
+func WithContext(ctx context.Context) RequestOption {
+	return func(r *http.Request) error {
+		*r = *r.WithContext(ctx)
+		return nil
+	}
+}
 
 // A Client manages communication with the JIRA API.
 type Client struct {
@@ -90,7 +100,7 @@ func NewClient(httpClient *http.Client, baseURL string) (*Client, error) {
 // NewRawRequest creates an API request.
 // A relative URL can be provided in urlStr, in which case it is resolved relative to the baseURL of the Client.
 // Allows using an optional native io.Reader for sourcing the request body.
-func (c *Client) NewRawRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
+func (c *Client) NewRawRequest(method, urlStr string, body io.Reader, opts ...RequestOption) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -103,6 +113,10 @@ func (c *Client) NewRawRequest(method, urlStr string, body io.Reader) (*http.Req
 	req, err := http.NewRequest(method, u.String(), body)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, opt := range opts {
+		opt(req)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -128,7 +142,7 @@ func (c *Client) NewRawRequest(method, urlStr string, body io.Reader) (*http.Req
 // NewRequest creates an API request.
 // A relative URL can be provided in urlStr, in which case it is resolved relative to the baseURL of the Client.
 // If specified, the value pointed to by body is JSON encoded and included as the request body.
-func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlStr string, body interface{}, opts ...RequestOption) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -150,6 +164,9 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
 		return nil, err
+	}
+	for _, opt := range opts {
+		opt(req)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -197,7 +214,7 @@ func addOptions(s string, opt interface{}) (string, error) {
 // NewMultiPartRequest creates an API request including a multi-part file.
 // A relative URL can be provided in urlStr, in which case it is resolved relative to the baseURL of the Client.
 // If specified, the value pointed to by buf is a multipart form.
-func (c *Client) NewMultiPartRequest(method, urlStr string, buf *bytes.Buffer) (*http.Request, error) {
+func (c *Client) NewMultiPartRequest(method, urlStr string, buf *bytes.Buffer, opts ...RequestOption) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -210,6 +227,9 @@ func (c *Client) NewMultiPartRequest(method, urlStr string, buf *bytes.Buffer) (
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
 		return nil, err
+	}
+	for _, opt := range opts {
+		opt(req)
 	}
 
 	// Set required headers

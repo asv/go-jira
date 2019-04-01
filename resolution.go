@@ -19,9 +19,9 @@ type Resolution struct {
 // GetList gets all resolutions from JIRA
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-resolution-get
-func (s *ResolutionService) GetList() ([]Resolution, *Response, error) {
+func (s *ResolutionService) GetList(opts ...RequestOption) ([]Resolution, *Response, error) {
 	apiEndpoint := "rest/api/2/resolution"
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

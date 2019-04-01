@@ -27,12 +27,12 @@ type IssuesInSprintResult struct {
 // The maximum number of issues that can be moved in one operation is 50.
 //
 // JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/sprint-moveIssuesToSprint
-func (s *SprintService) MoveIssuesToSprint(sprintID int, issueIDs []string) (*Response, error) {
+func (s *SprintService) MoveIssuesToSprint(sprintID int, issueIDs []string, opts ...RequestOption) (*Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/agile/1.0/sprint/%d/issue", sprintID)
 
 	payload := IssuesWrapper{Issues: issueIDs}
 
-	req, err := s.client.NewRequest("POST", apiEndpoint, payload)
+	req, err := s.client.NewRequest("POST", apiEndpoint, payload, opts...)
 
 	if err != nil {
 		return nil, err
@@ -50,10 +50,10 @@ func (s *SprintService) MoveIssuesToSprint(sprintID int, issueIDs []string) (*Re
 // By default, the returned issues are ordered by rank.
 //
 //  JIRA API Docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/sprint-getIssuesForSprint
-func (s *SprintService) GetIssuesForSprint(sprintID int) ([]Issue, *Response, error) {
+func (s *SprintService) GetIssuesForSprint(sprintID int, opts ...RequestOption) ([]Issue, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/agile/1.0/sprint/%d/issue", sprintID)
 
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 
 	if err != nil {
 		return nil, nil, err
@@ -78,17 +78,17 @@ func (s *SprintService) GetIssuesForSprint(sprintID int) ([]Issue, *Response, er
 // JIRA API docs: https://docs.atlassian.com/jira-software/REST/7.3.1/#agile/1.0/issue-getIssue
 //
 // TODO: create agile service for holding all agile apis' implementation
-func (s *SprintService) GetIssue(issueID string, options *GetQueryOptions) (*Issue, *Response, error) {
+func (s *SprintService) GetIssue(issueID string, queryOpts *GetQueryOptions, opts ...RequestOption) (*Issue, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/agile/1.0/issue/%s", issueID)
 
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if options != nil {
-		q, err := query.Values(options)
+	if queryOpts != nil {
+		q, err := query.Values(queryOpts)
 		if err != nil {
 			return nil, nil, err
 		}

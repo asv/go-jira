@@ -28,9 +28,9 @@ const (
 // GetList gets all status categories from JIRA
 //
 // JIRA API docs: https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-statuscategory-get
-func (s *StatusCategoryService) GetList() ([]StatusCategory, *Response, error) {
+func (s *StatusCategoryService) GetList(opts ...RequestOption) ([]StatusCategory, *Response, error) {
 	apiEndpoint := "rest/api/2/statuscategory"
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

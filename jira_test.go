@@ -2,6 +2,7 @@ package jira
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -595,4 +596,16 @@ func TestCookieAuthTransport_SessionObject_DoesNotExist(t *testing.T) {
 	basicAuthClient, _ := NewClient(tp.Client(), testServer.URL)
 	req, _ := basicAuthClient.NewRequest("GET", ".", nil)
 	basicAuthClient.Do(req, nil)
+}
+
+func TestRequestWithContext(t *testing.T) {
+	ctx := context.TODO()
+	c, _ := NewClient(nil, "")
+	req, err := c.NewRequest("GET", ".", nil, WithContext(ctx))
+	if err != nil {
+		t.Fatalf("Failed to create request with context: %+v.", err)
+	}
+	if !reflect.DeepEqual(req.Context(), ctx) {
+		t.Fatal("Context was not set correctly")
+	}
 }

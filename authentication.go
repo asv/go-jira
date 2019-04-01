@@ -56,7 +56,7 @@ type Session struct {
 // JIRA API docs: https://docs.atlassian.com/jira/REST/latest/#auth/1/session
 //
 // Deprecated: Use CookieAuthTransport instead
-func (s *AuthenticationService) AcquireSessionCookie(username, password string) (bool, error) {
+func (s *AuthenticationService) AcquireSessionCookie(username, password string, opts ...RequestOption) (bool, error) {
 	apiEndpoint := "rest/auth/1/session"
 	body := struct {
 		Username string `json:"username"`
@@ -66,7 +66,7 @@ func (s *AuthenticationService) AcquireSessionCookie(username, password string) 
 		password,
 	}
 
-	req, err := s.client.NewRequest("POST", apiEndpoint, body)
+	req, err := s.client.NewRequest("POST", apiEndpoint, body, opts...)
 	if err != nil {
 		return false, err
 	}
@@ -119,13 +119,13 @@ func (s *AuthenticationService) Authenticated() bool {
 //
 // Deprecated: Use CookieAuthTransport to create base client.  Logging out is as simple as not using the
 // client anymore
-func (s *AuthenticationService) Logout() error {
+func (s *AuthenticationService) Logout(opts ...RequestOption) error {
 	if s.authType != authTypeSession || s.client.session == nil {
 		return fmt.Errorf("no user is authenticated")
 	}
 
 	apiEndpoint := "rest/auth/1/session"
-	req, err := s.client.NewRequest("DELETE", apiEndpoint, nil)
+	req, err := s.client.NewRequest("DELETE", apiEndpoint, nil, opts...)
 	if err != nil {
 		return fmt.Errorf("Creating the request to log the user out failed : %s", err)
 	}
@@ -148,7 +148,7 @@ func (s *AuthenticationService) Logout() error {
 // GetCurrentUser gets the details of the current user.
 //
 // JIRA API docs: https://docs.atlassian.com/jira/REST/latest/#auth/1/session
-func (s *AuthenticationService) GetCurrentUser() (*Session, error) {
+func (s *AuthenticationService) GetCurrentUser(opts ...RequestOption) (*Session, error) {
 	if s == nil {
 		return nil, fmt.Errorf("AUthenticaiton Service is not instantiated")
 	}
@@ -157,7 +157,7 @@ func (s *AuthenticationService) GetCurrentUser() (*Session, error) {
 	}
 
 	apiEndpoint := "rest/auth/1/session"
-	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("Could not create request for getting user info : %s", err)
 	}
